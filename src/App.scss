@@ -23,7 +23,9 @@
 
   font-family: Arial, Helvetica, sans-serif;
   .noselect {
-    font: 600 calc(1.3em + 2vw) "Verdana";
+    font-weight: 600;
+    font-size: calc(1.3em + 2vw);
+    font-family: "Verdana";
     margin-right: 10px;
   }
 }
