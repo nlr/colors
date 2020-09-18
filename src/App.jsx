@@ -13,8 +13,7 @@ function randomHex() {
 }
 
 function App() {
-  const [backgroundColor, setBackgroundColor] = React.useState(randomHex());
-  const textAreaRef = React.useRef(null);
+  const [backgroundColor, setBackgroundColor] = React.useState("#ffffff");
 
   React.useEffect(() => {
     document.body.style.backgroundColor = backgroundColor;
@@ -24,23 +23,13 @@ function App() {
     setBackgroundColor(randomHex());
   }
 
-  function handleColorClick(e) {
-    console.log(textAreaRef);
-    document.execCommand("copy");
-  }
-
   return (
     <>
       <main>
         <div className="container">
           <div className="box">
             <div className="noselect">background color:</div>
-            <span
-              ref={textAreaRef}
-              onClick={handleColorClick}
-              style={{ color: backgroundColor }}
-              className="color"
-            >
+            <span style={{ color: backgroundColor }} className="color">
               {backgroundColor}
             </span>
           </div>

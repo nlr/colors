@@ -1,5 +1,9 @@
 @import "~bootstrap/scss/bootstrap";
 
+body {
+  transition: background-color 450ms ease-in-out, opacity 120ms linear;
+}
+
 .container {
   display: flex;
   flex-direction: column;
@@ -8,7 +12,6 @@
   height: 100vh;
   width: 100vw;
   color: white;
-  transition: background-color 1000ms linear;
 }
 
 .box {
@@ -16,6 +19,7 @@
   align-items: center;
   justify-content: center;
   height: 15vh;
+  min-height: 60px;
   width: 100vw;
   background-color: rgba(0, 0, 0, 0.5);
   filter: blur(20);
