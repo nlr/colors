@@ -1,4 +1,4 @@
 # Colorflipper
 Random color generator
 
-[Demo](https://colorflipper.herokuapp.com/)
+[Demo](https://colorflipper-git-master-nlr1.vercel.app/)
