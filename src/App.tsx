@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import './App.scss';
 import chroma from 'chroma-js';
 import { ColorBox } from './ColorBox';
 
-type Color = {
+export type Color = {
   isLocked: boolean;
   hex: string;
 };
@@ -38,9 +38,58 @@ const initialColors = (): Color[] => {
   return [generateNewColor()];
 };
 
+export enum ColorsActions {
+  TOGGLE_LOCK = 'toggle_lock',
+  UPDATE_COLOR = 'update_color',
+  UPDATE_ALL_COLORS = 'update_all_colors',
+  ADD_COLORS = 'add_colors',
+  REMOVE_COLORS = 'remove_colors',
+}
+
+const colorsReducer = (
+  state: Color[],
+  action: { type: ColorsActions; payload?: any },
+): Color[] => {
+  switch (action.type) {
+    case ColorsActions.TOGGLE_LOCK: {
+      return state.map((color) =>
+        color.hex !== action.payload
+          ? color
+          : { ...color, isLocked: !color.isLocked },
+      );
+    }
+    case ColorsActions.UPDATE_COLOR: {
+      return state.map((color) => {
+        if (color.isLocked && color.hex !== action.payload) {
+          return color;
+        }
+        return generateNewColor();
+      });
+    }
+    case ColorsActions.UPDATE_ALL_COLORS: {
+      return state.map((color) =>
+        color.isLocked ? color : generateNewColor(),
+      );
+    }
+    case ColorsActions.ADD_COLORS: {
+      let newColors = [];
+      for (let i = 0; i < action.payload; i++) {
+        newColors.push(generateNewColor());
+      }
+      return [...state, ...newColors];
+    }
+    case ColorsActions.REMOVE_COLORS: {
+      return state.slice(0, Math.min(state.length, action.payload));
+    }
+
+    default:
+      throw new Error('unknown action type');
+  }
+};
+
 export default function App() {
-  const [colors, setColors] = useState(() => initialColors());
-  const [colorsCount, setColorsCount] = useState(colors.length);
+  const [colors, dispatch] = useReducer(colorsReducer, initialColors());
+  const colorsCount = colors.length;
 
   useEffect(() => {
     window.location.hash = colors
@@ -55,50 +104,30 @@ export default function App() {
     };
   }, []);
 
-  const detectKeyPress = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === ' ' || e.code === 'Space') {
-        e.preventDefault();
-        setColors((prev) =>
-          prev.map((color) =>
-            color.isLocked === true ? color : generateNewColor(),
-          ),
-        );
-      }
-    },
-    [colorsCount, colors],
-  );
-
-  const handleRangeChange = () => {
-    if (colorsCount > colors.length) {
-      let newColors: Color[] = [];
-      for (let i = 0; i < colorsCount - colors.length; i++) {
-        newColors.push(generateNewColor());
-      }
-      setColors((prev) => [...prev, ...newColors]);
-    }
-
-    if (colorsCount < colors.length) {
-      setColors((state) =>
-        state.slice(0, Math.min(colors.length, colorsCount)),
-      );
+  const detectKeyPress = (e: KeyboardEvent) => {
+    if (e.key === ' ' || e.code === 'Space') {
+      e.preventDefault();
+      dispatch({
+        type: ColorsActions.UPDATE_ALL_COLORS,
+      });
     }
   };
 
-  const updateColor = (hex: string) => {
-    const updatedColors = colors.map((color) => {
-      if (color.hex === hex) {
-        return { ...color, isLocked: !color.isLocked };
-      }
-      return color;
-    });
+  const handleRangeChange = (range: number) => {
+    if (range > colorsCount) {
+      dispatch({
+        type: ColorsActions.ADD_COLORS,
+        payload: range - colorsCount,
+      });
+    }
 
-    setColors(updatedColors);
+    if (range < colorsCount) {
+      dispatch({
+        type: ColorsActions.REMOVE_COLORS,
+        payload: range - colorsCount,
+      });
+    }
   };
-
-  useEffect(() => {
-    handleRangeChange();
-  }, [colorsCount]);
 
   return (
     <>
@@ -109,15 +138,14 @@ export default function App() {
         <div className="header__item">
           <input
             className="header__item"
-            onChange={(e) => setColorsCount(Number(e.target.value))}
+            onChange={(e) => handleRangeChange(Number(e.target.value))}
             type="range"
             name="colors"
             id="colors"
             value={colorsCount}
             min={1}
-            max={6}
+            max={MAX_COLORS}
           />
-          {colorsCount}
         </div>
       </header>
       <main>
@@ -128,7 +156,7 @@ export default function App() {
                 key={color.hex}
                 hex={color.hex}
                 isLocked={color.isLocked}
-                clickHandler={updateColor}
+                dispatch={dispatch}
               />
             ))}
         </div>
