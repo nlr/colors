@@ -1,11 +1,11 @@
 {
   "name": "colorflipper",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "dependencies": {
     "chroma-js": "^2.4.2",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "scripts": {
     "start": "vite",
@@ -17,7 +17,8 @@
   },
   "devDependencies": {
     "@types/chroma-js": "^2.1.4",
-    "@types/react-dom": "^18.0.9",
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^2.2.0",
     "sass": "^1.56.1",
     "typescript": "^4.9.3",
